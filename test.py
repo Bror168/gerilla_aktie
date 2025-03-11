@@ -8,7 +8,7 @@ def get_omxs30_companies():
     return companies
 
 companies = get_omxs30_companies()
-    
+omx_list=[]
 for index, row in companies.head(30).iterrows():
     symbol = row["Symbol"]
     ny_symbol=""
@@ -18,3 +18,6 @@ for index, row in companies.head(30).iterrows():
         else:
             ny_symbol+=symbol[i]
     print(f"{ny_symbol}"+".ST")
+    omx_list.append(ny_symbol +".ST")
+print(omx_list)
+
