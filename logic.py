@@ -1,4 +1,66 @@
 import yfinance as yf
+import pandas as pd
+import numpy as np
+
+def quick_sort(arr):
+    if len(arr) <= 1:
+        return arr
+    pivot = arr[len(arr) // 2]
+    left = [x for x in arr if x < pivot]
+    middle = [x for x in arr if x == pivot]
+    right = [x for x in arr if x > pivot]
+    return quick_sort(left) + middle + quick_sort(right)
+
+def get_ohlc_data(ticker_symbol, period="5d", interval="1d"):
+    stock = yf.Ticker(ticker_symbol)
+    data = stock.history(period=period, interval=interval)
+    return data
+
+def calc_rsi(data, period=2):
+    #rsi calculatorn funkar ish brukar vara 2-3% för mycket/för lite 
+    # gämfört med avanzas rsi calculator. Men är tillräkkligt när aför mitt ändamål.
+    series = data["Close"]
+    delta = series.diff().dropna()
+    u = np.where(delta > 0, delta, 0)
+    d = np.where(delta < 0, -delta, 0)
+    avg_gain = np.mean(u[:period])  
+    avg_loss = np.mean(d[:period])  
+    u = np.concatenate(([avg_gain], u[period:]))
+    d = np.concatenate(([avg_loss], d[period:]))
+    rs = pd.Series(u).ewm(com=period-1, adjust=False).mean() / \
+         pd.Series(d).ewm(com=period-1, adjust=False).mean()
+    
+    return 100 - 100 / (1 + rs[2])
+
+
+def Boll_Band(data):
+    high_list = data["High"].tolist()
+    low_list = data["Low"].tolist()
+
+    return high_list[-1]/low_list[-1]
+
+
+def roc(ticker):
+    roc_list=[]
+    stock = yf.Ticker(ticker)
+    data = stock.history(period="5d", interval="1d")["Close"].tolist()
+    print(data)
+    if data[-1]>data[0]:
+        roc_list.append(True)
+    else:
+        roc_list.append(False)
+    data = stock.history(period="1mo", interval="1d")["Close"].tolist()
+    if data[-1]>data[0]:
+        roc_list.append(True)
+    else:
+        roc_list.append(False)
+    data = stock.history(period="3mo", interval="1d")["Close"].tolist()
+    if data[-1]>data[0]:
+        roc_list.append(True)
+    
+    return roc_list
+
+
 
 def SMA20(ticker_symbol, dag):  # dag=1 är idag
     stock = yf.Ticker(ticker_symbol)
@@ -156,13 +218,13 @@ def interference_form(data):
     open_list = data["Open"].tolist()
     san=True
     # stägning för 4 ddg sen är negativ
-    if not (close_list[-5]-open_list[-5])<0:
+    if (close_list[-5]-open_list[-5])>0:
         san=False
     #stägning för 3 dagar sen är posetiv
-    if not (close_list[-4]-open_list[-4])>0:
+    if (close_list[-4]-open_list[-4])<0:
         san=False
     #stägningen för förgår, igår o idag är negativ
-    if not (close_list[-3]-open_list[-3])<0 and (close_list[-2]-open_list[-2])<0 and (close_list[-1]-open_list[-1])<0:
+    if (close_list[-3]-open_list[-3])>0 and (close_list[-2]-open_list[-2])>0 and (close_list[-1]-open_list[-1])>0:
         san=False
 
     return san
