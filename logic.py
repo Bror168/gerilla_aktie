@@ -1,6 +1,7 @@
 import yfinance as yf
 import pandas as pd
 import numpy as np
+import math
 
 def quick_sort(arr):
     if len(arr) <= 1:
@@ -32,12 +33,28 @@ def calc_rsi(data, period=2):
     
     return 100 - 100 / (1 + rs[2])
 
+def SMA20(ticker_symbol, dag):  # dag=1 är idag
+    stock = yf.Ticker(ticker_symbol)
+    data = stock.history(period="2mo", interval="1d")
+    close_list = data["Close"].tolist()
+    return sum(close_list[-20-dag : -dag]) / 20
 
-def Boll_Band(data):
-    high_list = data["High"].tolist()
-    low_list = data["Low"].tolist()
+def Boll_Band(ticker):
+    stock = yf.Ticker(ticker)
+    data = stock.history(period="2mo", interval="1d")
+    close_list = data["Close"].tolist()
+    
+    period_closes = close_list[-20: -1]
+    mean = sum(period_closes) / len(period_closes)
 
-    return high_list[-1]/low_list[-1]
+    #räknar ut diviation från sma20
+    squared_diffs = [(price - mean) ** 2 for price in period_closes]
+    variance = sum(squared_diffs) / (len(period_closes) - 1)
+    std_dev = math.sqrt(variance)
+    upper_band = mean + (2 * std_dev)
+    lower_band = mean - (2 * std_dev)
+
+    return upper_band/lower_band
 
 
 def roc(ticker):
@@ -60,13 +77,6 @@ def roc(ticker):
     
     return roc_list
 
-
-
-def SMA20(ticker_symbol, dag):  # dag=1 är idag
-    stock = yf.Ticker(ticker_symbol)
-    data = stock.history(period="2mo", interval="1d")
-    close_list = data["Close"].tolist()
-    return sum(close_list[-20-dag : -dag]) / 20
 
 def SMA(ticker_symbol, period, day):
     stock = yf.Ticker(ticker_symbol)

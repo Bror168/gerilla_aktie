@@ -21,7 +21,7 @@ def get_sp500_list():
     sp500_list.pop(73)
     return sp500_list
 
-nasdaq_list=get_sp500_list()
+#nasdaq_list=get_sp500_list()
 
 data = pd.DataFrame({
     "Open": [100, 105, 110, 115],  
@@ -33,61 +33,55 @@ data = pd.DataFrame({
 #print((nasdaq_list[475]))
 #print(ett80_form(get_ohlc_data(nasdaq_list[59])))
 
-def single_analys(chek_tiker, found):
+def single_analys(chek_tiker):
     ohlc = get_ohlc_data(chek_tiker)
-    found[0] = False
+    found = False
+    form_list=[]
 
     if lo.ett80_form(ohlc):
-        print("{}: 180".format(chek_tiker))
-        found[0] = True
+        form_list.append("180")
     if lo.reversal_form(ohlc):
-        print("{}: reversal".format(chek_tiker))
-        found[0] = True
+        form_list.append("reversal")
     if lo.spik_form(ohlc):
-        print("{} : spik".format(chek_tiker))
-        found[0] = True
+        form_list.append("spik")
     if lo.key_reversal_form(ohlc):
-        print("{} : key_reversel".format(chek_tiker))
-        found[0] = True
+        form_list.append("key_reversel")
     if lo.interference_form(ohlc):
-        print("{} : interference".format(chek_tiker))
-        found[0] = True
+        form_list.append("interference")
     if lo.fort_form(chek_tiker):
-        print("{} : fortsätnings".format(chek_tiker))
-        found[0] = True
+        form_list.append("fortsätnings")
     if lo.holy_grail_form(ohlc, chek_tiker):
-        print("{} : holy grail!".format(chek_tiker))
-        found[0] = True
+        form_list.append("holy grail!")
     if lo.pattern_gap_form(ohlc):
-        print("{} : patern gap".format(chek_tiker))
-        found[0] = True
+        form_list.append("patern gap")
     if lo.impuls_form(ohlc, chek_tiker):
-        print("{} : impuls".format(chek_tiker))
-        found[0] = True
+        form_list.append("impuls")
     if lo.Riko_form(ohlc):
-        print("{} : rikoshet".format(chek_tiker))
-        found[0] = True
+        form_list.append("rikoshet")
     if lo.reversal_gap_formation(ohlc):
-        print("{} : reversel gap".format(chek_tiker))
-        found[0] = True
-
-    return found[0]
+        form_list.append("reversel gap")
+    
+    if len(form_list)>0:
+        found=True
+    
+    return form_list, found
 
 def list_analys(list):
-    good_boys=[]
-    found=[False]
-    for i in range(len(list)-400):
-        single_analys(list[i], found)
-        if found[0] :
-            good_boys.append(list[i])
-
+    print(list)
+    return_list=[]
+    form_list=[]
+    for i in range(len(list)):
+        good=single_analys(list[i])
+        if good[-1]:
+            return_list.append(list[i])
+            form_list.append(good[0])
         if i%60==0 and i!=0:
             print("pausar pga 'Rate limited'.")
             time.sleep(30)
             print("startar igen")
-    return good_boys
+    return return_list , form_list
 
-good_boys=['MMM', 'ABT', 'ABBV', 'ACN', 'ADBE', 'AMD', 'AES', 'AFL', 'A', 'APD', 'ABNB', 'AKAM', 'ALGN', 'ALLE', 'LNT', 'GOOGL', 'GOOG', 'MO', 'AMZN', 'AMCR', 'AEE', 'AXP', 'AIG', 'AMT', 'AMP', 'AME', 'ADI', 'ANSS', 'APA', 'APO', 'AMAT', 'APTV', 'ANET', 'ATO', 'ADSK', 'ADP', 'AVB', 'AVY', 'AXON', 'BKR', 'BALL', 'BAC', 'BDX', 'BBY', 'TECH', 'BIIB', 'BLK', 'BX', 'BK', 'BKNG', 'BSX', 'AVGO', 'BR', 'BXP', 'CHRW', 'CDNS', 'CZR', 'CPT', 'CPB', 'COF', 'CAH', 'CCL', 'CARR', 'CAT', 'CBRE', 'CNC', 'CNP', 'CF', 'CHTR', 'CVX', 'CMG', 'CB']
+good_boys=['MMM', 'AOS', 'ABT', 'ABBV', 'ACN', 'ADBE', 'AFL', 'A', 'APD', 'AKAM', 'ARE', 'ALGN', 'ALL', 'GOOGL', 'GOOG', 'MO', 'AEE', 'AEP', 'AMT', 'AMGN', 'ADI', 'ANSS', 'AON', 'AAPL', 'APTV', 'ACGL', 'AJG', 'AIZ', 'T', 'ATO', 'ADP', 'AZO', 'AVB', 'BKR', 'BALL', 'BAX', 'BIIB', 'BK', 'BKNG', 'BSX', 'BR', 'BRO', 'CHRW', 'CDNS', 'CZR', 'CPT', 'CPB', 'CCL', 'CBOE', 'CDW', 'CNC', 'CNP', 'CHTR', 'CVX', 'CB', 'CHD']
 def sort_rsi(list):
     temp_list=list
     rsi_list=[]
@@ -109,8 +103,7 @@ def sort_BB(list):
     bb_list=[]
     ticker_list=[]
     for i in range(len(list)):
-        ohlc = get_ohlc_data(list[i])
-        bb_list.append(lo.Boll_Band(ohlc))
+        bb_list.append(lo.Boll_Band(list[i]))
     sorted_BB=lo.quick_sort(bb_list)
     
     for i in range(len(sorted_BB)):
@@ -123,7 +116,15 @@ def sort_BB(list):
 #print (list_analys(nasdaq_list))
 
 
-b= sort_BB(good_boys)
-print(b[0])
-print(lo.calc_rsi(get_ohlc_data("ato")))
-print(lo.Boll_Band(get_ohlc_data("ato")))
+#b= sort_BB(good_boys)
+#print(b[-1])
+#print("rsi:")
+#print(lo.calc_rsi(get_ohlc_data("VOLV-B.ST")))
+#print("vol:")
+#print(lo.Boll_Band("VOLV-B.ST"))
+#print(single_analys("VOLV-B.ST"))
+# Assuming these exist and work
+
+
+
+
