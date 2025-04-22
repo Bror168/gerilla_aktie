@@ -21,17 +21,24 @@ def get_sp500_list():
     sp500_list.pop(73)
     return sp500_list
 
-#nasdaq_list=get_sp500_list()
+def omx30():
+    url = "https://en.wikipedia.org/wiki/OMX_Stockholm_30"
+    df_list = pd.read_html(url)
+    omxs30_df = df_list[1]  # Justera indexet om det behövs
+    companies = omxs30_df[["Company", "Symbol"]]
+    print(companies, 1)
 
-data = pd.DataFrame({
-    "Open": [100, 105, 110, 115],  
-    "High": [110, 115, 120, 125],  
-    "Low": [95, 100, 113, 94],  
-    "Close": [108, 112, 114, 123]  
-})
-
-#print((nasdaq_list[475]))
-#print(ett80_form(get_ohlc_data(nasdaq_list[59])))
+    omx_list=[]
+    for index, row in companies.head(30).iterrows():
+        symbol = row["Symbol"]
+        ny_symbol=""
+        for i in range(len(symbol)):
+            if symbol[i]==" ":
+                ny_symbol+="-"
+            else:
+                ny_symbol+=symbol[i]
+        omx_list.append(ny_symbol +".ST")
+    return omx_list
 
 def single_analys(chek_tiker):
     ohlc = get_ohlc_data(chek_tiker)
@@ -82,7 +89,7 @@ def list_analys(list):
     return return_list , form_list
 
 good_boys=['MMM', 'AOS', 'ABT', 'ABBV', 'ACN', 'ADBE', 'AFL', 'A', 'APD', 'AKAM', 'ARE', 'ALGN', 'ALL', 'GOOGL', 'GOOG', 'MO', 'AEE', 'AEP', 'AMT', 'AMGN', 'ADI', 'ANSS', 'AON', 'AAPL', 'APTV', 'ACGL', 'AJG', 'AIZ', 'T', 'ATO', 'ADP', 'AZO', 'AVB', 'BKR', 'BALL', 'BAX', 'BIIB', 'BK', 'BKNG', 'BSX', 'BR', 'BRO', 'CHRW', 'CDNS', 'CZR', 'CPT', 'CPB', 'CCL', 'CBOE', 'CDW', 'CNC', 'CNP', 'CHTR', 'CVX', 'CB', 'CHD']
-def sort_rsi(list):
+def sort_RSI(list):
     temp_list=list
     rsi_list=[]
     ticker_list=[]
@@ -113,18 +120,4 @@ def sort_BB(list):
         bb_list[index]=""
     
     return ticker_list
-#print (list_analys(nasdaq_list))
-
-
-#b= sort_BB(good_boys)
-#print(b[-1])
-#print("rsi:")
-#print(lo.calc_rsi(get_ohlc_data("VOLV-B.ST")))
-#print("vol:")
-#print(lo.Boll_Band("VOLV-B.ST"))
-#print(single_analys("VOLV-B.ST"))
-# Assuming these exist and work
-
-
-
 
