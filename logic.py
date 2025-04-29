@@ -61,7 +61,6 @@ def roc(ticker):
     roc_list=[]
     stock = yf.Ticker(ticker)
     data = stock.history(period="5d", interval="1d")["Close"].tolist()
-    print(data)
     if data[-1]>data[0]:
         roc_list.append(True)
     else:

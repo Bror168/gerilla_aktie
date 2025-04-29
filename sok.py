@@ -26,7 +26,6 @@ def omx30():
     df_list = pd.read_html(url)
     omxs30_df = df_list[1]  # Justera indexet om det behövs
     companies = omxs30_df[["Company", "Symbol"]]
-    print(companies, 1)
 
     omx_list=[]
     for index, row in companies.head(30).iterrows():
@@ -74,7 +73,6 @@ def single_analys(chek_tiker):
     return form_list, found
 
 def list_analys(list):
-    print(list)
     return_list=[]
     form_list=[]
     for i in range(len(list)):
@@ -83,12 +81,9 @@ def list_analys(list):
             return_list.append(list[i])
             form_list.append(good[0])
         if i%60==0 and i!=0:
-            print("pausar pga 'Rate limited'.")
             time.sleep(30)
-            print("startar igen")
     return return_list , form_list
 
-good_boys=['MMM', 'AOS', 'ABT', 'ABBV', 'ACN', 'ADBE', 'AFL', 'A', 'APD', 'AKAM', 'ARE', 'ALGN', 'ALL', 'GOOGL', 'GOOG', 'MO', 'AEE', 'AEP', 'AMT', 'AMGN', 'ADI', 'ANSS', 'AON', 'AAPL', 'APTV', 'ACGL', 'AJG', 'AIZ', 'T', 'ATO', 'ADP', 'AZO', 'AVB', 'BKR', 'BALL', 'BAX', 'BIIB', 'BK', 'BKNG', 'BSX', 'BR', 'BRO', 'CHRW', 'CDNS', 'CZR', 'CPT', 'CPB', 'CCL', 'CBOE', 'CDW', 'CNC', 'CNP', 'CHTR', 'CVX', 'CB', 'CHD']
 def sort_RSI(list):
     temp_list=list
     rsi_list=[]
@@ -107,11 +102,16 @@ def sort_RSI(list):
 
 def sort_BB(list):
     temp_list=list
+    invert_list=[]
     bb_list=[]
     ticker_list=[]
     for i in range(len(list)):
+        
         bb_list.append(lo.Boll_Band(list[i]))
     sorted_BB=lo.quick_sort(bb_list)
+    for i in range(len(bb_list)):
+        invert_list.append(sorted_BB[-i-1])
+    sorted_BB=invert_list
     
     for i in range(len(sorted_BB)):
         index = bb_list.index(sorted_BB[i])
@@ -120,4 +120,3 @@ def sort_BB(list):
         bb_list[index]=""
     
     return ticker_list
-
