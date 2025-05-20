@@ -13,9 +13,6 @@ aktie_list=[]
 #for idx in range(len(roc)):
 #output+=f"{roc[idx]}\n"
 
-dat = yf.Ticker("AAPL")
-dat=dat.history(period='1mo')
-print(dat)
 
 #analyserar en aktie
 def run_single_analysis():
@@ -205,85 +202,106 @@ def show_best_analyze():
 
     
 
-# GUI setup
+# ======= GUI ========
+
+# färgtema
+bg_color = "#343541"
+btn_color = "#444654"
+text_color = "#ffffff"
+
 root = tk.Tk()
 root.title("Stock Analyzer")  # Fönstertitel
+root.configure(bg=bg_color)
+
+# hjälpmetoder för att implementera färger
+def colored_button(master, text, command):
+    return tk.Button(master, text=text, command=command, bg=btn_color, fg=text_color, activebackground="#555555", activeforeground=text_color)
+
+def colored_label(master, text):
+    return tk.Label(master, text=text, bg=bg_color, fg=text_color)
+
+def colored_entry(master, width=30):
+    return tk.Entry(master, width=width, bg=btn_color, fg=text_color, insertbackground=text_color)
+
+def colored_text(master, height=15, width=30, yscrollcommand=None):
+    return tk.Text(master, height=height, width=width, wrap="word", bg=btn_color, fg=text_color, insertbackground=text_color, yscrollcommand=yscrollcommand)
+
 
 #knappar
-top_button_frame = tk.Frame(root)  # Översta raden med knappar för att byta analysläge
+top_button_frame = tk.Frame(root, bg=bg_color)  # Översta raden med knappar för att byta analysläge
 top_button_frame.pack(pady=10)
 
 # Knappar för att växla mellan analyslägen (byter vy)
-tk.Button(top_button_frame, text="Single Analyze", command=show_single_analyze).pack(side="left", padx=5)
-tk.Button(top_button_frame, text="List Analyze", command=show_list_analyze).pack(side="left", padx=5)
-tk.Button(top_button_frame, text="Index Analyze", command=show_index_analyze).pack(side="left", padx=5)
-tk.Button(top_button_frame, text="best stock", command=show_best_analyze).pack(side="left", padx=5)
+colored_button(top_button_frame, "Single Analyze", show_single_analyze).pack(side="left", padx=5)
+colored_button(top_button_frame, "List Analyze", show_list_analyze).pack(side="left", padx=5)
+colored_button(top_button_frame, "Index Analyze", show_index_analyze).pack(side="left", padx=5)
+colored_button(top_button_frame, "best stock", show_best_analyze).pack(side="left", padx=5)
 
 
 #single analys
-single_frame = tk.Frame(root)  # Ram för single analyse-vyn
+single_frame = tk.Frame(root, bg=bg_color)  # Ram för single analyse-vyn
 
-tk.Label(single_frame, text="Enter Ticker Symbol:").pack(pady=5)  # Instruktionstext
-entry = tk.Entry(single_frame, width=30)  # Inmatningsfält för ticker
+colored_label(single_frame, "Enter Ticker Symbol:").pack(pady=5)  # Instruktionstext
+entry = colored_entry(single_frame)  # Inmatningsfält för ticker
 entry.pack(pady=5)
 
-tk.Button(single_frame, text="Analyze", command=run_single_analysis).pack(pady=10)  # Kör analys
+colored_button(single_frame, "Analyze", run_single_analysis).pack(pady=10)  # Kör analys
 
 # Här visas resultatet från analysen
-result_label = tk.Label(single_frame, text="", justify="left", wraplength=400)
+result_label = tk.Label(single_frame, text="", justify="left", wraplength=400, bg=bg_color, fg=text_color)
 result_label.pack(padx=10, pady=10)
 
 
 #list analys
-list_frame = tk.Frame(root)  # Ram för list analyse-vyn
-tk.Label(list_frame, text="Enter list e.g: AAPL NVDA MSFT").pack()  # Instruktionstext
-entry2 = tk.Entry(list_frame, width=30)  # Inmatningsfält för tickers
+list_frame = tk.Frame(root, bg=bg_color)  # Ram för list analyse-vyn
+colored_label(list_frame, "Enter list e.g: AAPL NVDA MSFT").pack()  # Instruktionstext
+entry2 = colored_entry(list_frame)  # Inmatningsfält för tickers
 entry2.pack(pady=5)
 
 # Knapp för att analysera alla tickers i listan
-tk.Button(list_frame, text="Analyze", command=run_list_analysis).pack(pady=10)
+colored_button(list_frame, "Analyze", run_list_analysis).pack(pady=10)
 # Knappar för att sortera analysresultat
-tk.Button(list_frame, text="sort rsi", command=lambda: sortera("rsi")).pack(pady=10)
-tk.Button(list_frame, text="sort bbu", command=lambda: sortera("bb")).pack(pady=10)
+colored_button(list_frame, "sort rsi", lambda: sortera("rsi")).pack(pady=10)
+colored_button(list_frame, "sort bbu", lambda: sortera("bb")).pack(pady=10)
 
 # Resultatfält med scrollbar
-result_frame2 = tk.Frame(list_frame)
+result_frame2 = tk.Frame(list_frame, bg=bg_color)
 result_frame2.pack(padx=10, pady=10, fill="both", expand=True)
 scrollbar2 = tk.Scrollbar(result_frame2)
 scrollbar2.pack(side="right", fill="y")
-result_text2 = tk.Text(result_frame2, wrap="word", yscrollcommand=scrollbar2.set, height=15, width=30)
+result_text2 = colored_text(result_frame2, yscrollcommand=scrollbar2.set)
 result_text2.pack(side="left", fill="both", expand=True)
 scrollbar2.config(command=result_text2.yview)
 
 
 #index analys
-index_frame = tk.Frame(root)  # Ram för index analyse-vyn
-tk.Label(index_frame, text="välj indexlista |OMX30, SP500|").pack()  # Instruktionstext
-entry3 = tk.Entry(index_frame, width=30)  # Inmatningsfält för indexnamn
+index_frame = tk.Frame(root, bg=bg_color)  # Ram för index analyse-vyn
+colored_label(index_frame, "välj indexlista |OMX30, SP500|").pack()  # Instruktionstext
+entry3 = colored_entry(index_frame)  # Inmatningsfält för indexnamn
 entry3.pack(pady=5)
 
-tk.Button(index_frame, text="Analyze", command=index_analyze).pack(pady=10)  # Kör analys
+colored_button(index_frame, "Analyze", index_analyze).pack(pady=10)  # Kör analys
 
 # Resultatfält med scrollbar
-result_frame3 = tk.Frame(index_frame)
+result_frame3 = tk.Frame(index_frame, bg=bg_color)
 result_frame3.pack(padx=10, pady=10, fill="both", expand=True)
 scrollbar3 = tk.Scrollbar(result_frame3)
 scrollbar3.pack(side="right", fill="y")
-result_text3 = tk.Text(result_frame3, wrap="word", yscrollcommand=scrollbar3.set, height=15, width=30)
+result_text3 = colored_text(result_frame3, yscrollcommand=scrollbar3.set)
 result_text3.pack(side="left", fill="both", expand=True)
 scrollbar3.config(command=result_text3.yview)
 
 
 #bästa aktien 
-best_frame = tk.Frame(root)  # Ram för best stock-vyn
-tk.Label(best_frame, text="whil finde the best stock\n input exemple |AAPL NVDA MSFT|").pack()  # Instruktionstext
-entry4 = tk.Entry(best_frame, width=30)  # Inmatningsfält för tickers
+best_frame = tk.Frame(root, bg=bg_color)  # Ram för best stock-vyn
+colored_label(best_frame, "whil finde the best stock\n input exemple |AAPL NVDA MSFT|").pack()  # Instruktionstext
+entry4 = colored_entry(best_frame)  # Inmatningsfält för tickers
 entry4.pack(pady=5)
 
-tk.Button(best_frame, text="Analyze", command=run_best_analysis).pack(pady=10)  # Kör analys
+colored_button(best_frame, "Analyze", run_best_analysis).pack(pady=10)  # Kör analys
 
 # Här visas topplistan med bästa aktier
-result_label4 = tk.Label(best_frame, text="", justify="left", wraplength=400)
+result_label4 = tk.Label(best_frame, text="", justify="left", wraplength=400, bg=bg_color, fg=text_color)
 result_label4.pack(padx=10, pady=10)
 
 # Startar huvudloopen för gränssnittet
