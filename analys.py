@@ -1,3 +1,10 @@
+# ----------------------------------------------------
+# Gerilla Aktie – © 2025 Bror168
+# Skapad av Bror168 (https://github.com/Bror168)
+# Denna kod är skyddad enligt MIT-licensen.
+# All kopiering utan erkännande är förbjuden.
+# ----------------------------------------------------
+
 import logic as lo
 import sok as so
 import tkinter as tk
