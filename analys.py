@@ -3,6 +3,7 @@
 # Skapad av Bror168 (https://github.com/Bror168)
 # Denna kod är skyddad enligt MIT-licensen.
 # All kopiering utan erkännande är förbjuden.
+# Version: 1.0.0
 # ----------------------------------------------------
 
 import logic as lo
