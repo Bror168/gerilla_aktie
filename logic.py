@@ -1,3 +1,11 @@
+# ----------------------------------------------------
+# Gerilla Aktie – © 2025 Bror168
+# Skapad av Bror168 (https://github.com/Bror168)
+# Denna kod är skyddad enligt MIT-licensen.
+# All kopiering utan erkännande är förbjuden.
+# Version: 1.0.0
+# ----------------------------------------------------
+
 import yfinance as yf
 import pandas as pd
 import numpy as np
