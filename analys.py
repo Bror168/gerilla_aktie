@@ -1,3 +1,11 @@
+# ----------------------------------------------------
+# Gerilla Aktie – © 2025 Bror168
+# Skapad av Bror168 (https://github.com/Bror168)
+# Denna kod är skyddad enligt MIT-licensen.
+# All kopiering utan erkännande är förbjuden.
+# Version: 1.0.0
+# ----------------------------------------------------
+
 import logic as lo
 import sok as so
 import tkinter as tk
@@ -6,6 +14,7 @@ import copy
 import yfinance as yf
 
 #global lista med aktier som hittas med list analys, sparas i en global variable för att sedan kunna användas för att sortera utifrån rsi och bbu
+
 aktie_list=[]
 
 #roc=roc(analys[0][i])
@@ -213,6 +222,16 @@ root = tk.Tk()
 root.title("Stock Analyzer")  # Fönstertitel
 root.configure(bg=bg_color)
 
+def show_ascii_frame(): #skriver ut github tagen till skärmen
+    ascii_frame = tk.Frame(root, bg=bg_color, bd=2, relief="sunken")
+    ascii_frame.pack(fill="x", pady=5)
+    ascii_art = "                                                               ,---.-,    \n                                                             '   ,'  '.  \n    ,---,.                                  ,---,             /   /      \\ \n  ,'  .'  \\                              ,`--.' |    ,---.   .   ;  ,/.  : \n,---.' .' |  __  ,-.   ,---.    __  ,-. /    /  :   /     \\  '   |  | :  ; \n|   |  |: |,' ,'/ /|  '   ,'\\ ,' ,'/ /|:    |.' '  /    / '  '   |  ./   : \n:   :  :  /'  | |' | /   /   |'  | |' |`----':  | .    ' /   |   :       , \n:   |    ; |  |   ,'.   ; ,. :|  |   ,'   '   ' ;'    / ;     \\   \\     /  \n|   :     \\'  :  /  '   | |: :'  :  /     |   | ||   :  \\      ;   ,   '\\  \n|   |   . ||  | '   '   | .; :|  | '      '   : ;;   |   ``.  /   /      \\ \n'   :  '; |;  : |   |   :    |;  : |      |   | ''   ;      \\.   ;  ,/.  : \n|   |  | ; |  , ;    \\   \\  / |  , ;      '   : |'   |  .\\  |'   |  | :  ; \n|   :   /   ---'      `----'   ---'       ;   |.'|   :  ';  :'   |  ./   : \n|   | ,'                                  '---'   \\   \\    / |   :      /  \n`----'                                             `---`--`   \\   \\   .'   \n                                                               `---`-'      \n"
+    label = tk.Label(ascii_frame, text=ascii_art, font=("Courier", 7), bg=bg_color, fg=text_color, justify="left")
+    label.pack(padx=10, pady=5)
+    # Ta bort ramen efter 3 sekunder
+    root.after(1000, ascii_frame.destroy)
+
+
 # hjälpmetoder för att implementera färger
 def colored_button(master, text, command):
     return tk.Button(master, text=text, command=command, bg=btn_color, fg=text_color, activebackground="#555555", activeforeground=text_color)
@@ -236,6 +255,8 @@ colored_button(top_button_frame, "Single Analyze", show_single_analyze).pack(sid
 colored_button(top_button_frame, "List Analyze", show_list_analyze).pack(side="left", padx=5)
 colored_button(top_button_frame, "Index Analyze", show_index_analyze).pack(side="left", padx=5)
 colored_button(top_button_frame, "best stock", show_best_analyze).pack(side="left", padx=5)
+
+show_ascii_frame()
 
 
 #single analys
