@@ -1,11 +1,13 @@
-Här är ett förslag på en **README.md**-fil för GitHub-repot `gerilla_aktie`. Den är strukturerad för att ge en tydlig introduktion, installationsinstruktioner, användning och bidra-riktlinjer:
+Här är ett förslag på en **README.md**-fil för GitHub-repot `gerilla_aktie`. Den är strukturerad för att ge en tydlig introduktion, 
+installationsinstruktioner, användning och bidra-riktlinjer:
 
 ---
 
 ```markdown
 # 📈 Gerilla Aktie
 
-**Gerilla Aktie** är ett Python-baserat verktyg för att analysera aktiemarknadsdata och identifiera potentiella köp- och säljsignaler. Projektet syftar till att förenkla beslutsfattande för investerare genom att automatisera analysprocesser.
+**Gerilla Aktie** är ett Python-baserat verktyg för att analysera aktiemarknadsdata och identifiera potentiella köp- och säljsignaler.
+Projektet syftar till att förenkla beslutsfattande för investerare genom att automatisera analysprocesser.
 
 ## 🚀 Funktioner
 
@@ -78,9 +80,4 @@ Detta projekt är open-source och distribueras under [MIT-licensen](LICENSE).
 
 *Byggt av [Bror168](https://github.com/Bror168)* 🚀
 
-```
-
----
-
-Vill du att jag sparar detta direkt i en `README.md`-fil som du kan ladda ner?
 ```
