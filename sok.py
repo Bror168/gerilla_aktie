@@ -1,11 +1,3 @@
-# ----------------------------------------------------
-# Gerilla Aktie – © 2025 Bror168
-# Skapad av Bror168 (https://github.com/Bror168)
-# Denna kod är skyddad enligt MIT-licensen.
-# All kopiering utan erkännande är förbjuden.
-# Version: 1.0.0
-# ----------------------------------------------------
-
 import yfinance as yf #https://yfinance-python.org/reference/api/yfinance.Ticker.html
 import pandas as pd
 import logic as lo
@@ -23,6 +15,12 @@ def get_sp500_list():
     sp500_list.pop(60)
     sp500_list.pop(74)
     sp500_list.pop(73)
+    sp500_list.pop(255)
+
+    sp500_list.pop(281)
+    sp500_list.pop(415)
+    sp500_list.pop(493)
+
     return sp500_list
 
 def omx30():
@@ -95,6 +93,10 @@ def list_analys(list):
         #pga request limits till yfinance behöver programet pausa om den skickar för många requests 
         if i%60==0 and i!=0:
             time.sleep(30)
+        print(i, len(return_list))
+        if len(return_list)>=60:
+            return return_list , form_list
+              
     return return_list , form_list
 
 #sorterar aktier efter deras rsi värde

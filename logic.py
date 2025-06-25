@@ -1,10 +1,3 @@
-# ----------------------------------------------------
-# Gerilla Aktie – © 2025 Bror168
-# Skapad av Bror168 (https://github.com/Bror168)
-# Denna kod är skyddad enligt MIT-licensen.
-# All kopiering utan erkännande är förbjuden.
-# Version: 1.0.0
-# ----------------------------------------------------
 
 import yfinance as yf
 import pandas as pd
@@ -87,7 +80,7 @@ def roc(ticker):
     # --- 1 månad ---
     data = stock.history(period="1mo", interval="1d")["Close"].tolist()
     if data[-1] > data[0]:
-        roc_list.append("roc")
+        roc_list.append("roc22")
     # --- 3 månader ---
     data = stock.history(period="3mo", interval="1d")["Close"].tolist()
     if data[-1] > data[0]:

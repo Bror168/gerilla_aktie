@@ -57,7 +57,11 @@ python analys.py
 
 ## 🔧 TODO
 
-* [ ] Implementera mer avancerade analysmetoder
+* [ ] Implementera mer avancerade analysmetoder:
+* [ ] värden på formationer
+* [ ] formation boosters
+* [ ] volym mm
+
 * [ ] Lägga till datavisualisering
 * [ ] Förbättra felhantering
 * [ ] Dokumentera funktionerna mer utförligt

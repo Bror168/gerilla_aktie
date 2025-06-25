@@ -12,6 +12,7 @@ import tkinter as tk
 from tkinter import messagebox
 import copy
 import yfinance as yf
+import numpy as np
 
 #global lista med aktier som hittas med list analys, sparas i en global variable för att sedan kunna användas för att sortera utifrån rsi och bbu
 
@@ -21,6 +22,16 @@ aktie_list=[]
 #output+="roc:\n"
 #for idx in range(len(roc)):
 #output+=f"{roc[idx]}\n"
+
+
+def fg(x, a=1, b=0.5):
+    if x <= 1:
+        return -1
+    elif x<=4:
+        return x*0.5
+    else:
+        x=5 + (1 - np.exp(-a * (x - 5))) * b
+        return float(round(x, 1))
 
 
 #analyserar en aktie
@@ -88,14 +99,62 @@ def run_best_analysis():
     bbu_topp = so.sort_BB(copy.deepcopy(aktie_list))   # Sorterad lista enligt BB
 
     wight_list = []  # Lista som håller viktningen (lägre värde = bättre rankning)
-
     for i in range(len(aktie_list)):
         # Kombinerar ranking från båda indikatorer
-        wight_list.append(bbu_topp.index(aktie_list[i]))
-        wight_list[i] += rsi_topp.index(aktie_list[i])
+        Roc=lo.roc(aktie_list[i])
+        mod=0
+        if "roc5" in Roc:
+            mod-=0.25
+        if "roc22" in Roc:    
+            mod-=0.75
+        if "roc66" in Roc:
+            mod-=1.5
+        wight_list.append(fg(bbu_topp.index(aktie_list[i])))
+        wight_list[i] += fg(rsi_topp.index(aktie_list[i]))
+        wight_list[i]+=mod
+
+        #extra mod beroände på om roc kombinerat med vissa formationer signalerar något extra viktigt
+        edge_data = {
+        ('key_reversel', 'roc5'): (68, 3.12),
+        ('key_reversel', 'roc22'): (63, 2.84),
+        ('patern gap', 'roc66'): (66, 1.65),
+        ('reversal', 'roc66'): (51, 1.28),
+        ('reversal', 'roc66'): (61, 1.82),
+        ('spik', 'roc66'): (61, 2.03),
+        ('interference', 'roc5'): (61, 1.45),
+        ('interference', 'roc22'): (58, 1.54),
+        ('interference', 'roc66'): (65, 1.73),
+        ('holy grail!', 'roc66'): (55, 0.69),
+        ('180', 'roc66'): (60, 1.01),
+        ('fortsätnings', 'roc66'): (60, 1.80),
+        ('impuls', 'roc66'): (55, 0.94)
+        }
+        score=0
+        for form in analys[1][i]:
+            for roc in Roc:
+                key = (form.lower(), roc.lower())
+                if key in edge_data:
+                    hitrate, avg_return = edge_data[key]
+                    if hitrate >= 65 and avg_return >= 2.5:
+                        score = 8
+                    elif hitrate >= 60 and avg_return >= 2.0:
+                        score = 6
+                    elif hitrate >= 55 and avg_return >= 1.5:
+                        score = 4
+                    elif hitrate >= 50 and avg_return >= 1.0:
+                        score = 2
+                    else:
+                        score=0
+                    if score>0:
+                        print(f"s{score}")
+        mod-=score
+
+        for i in range(len(analys[1][i])-1):
+            mod-=5
 
     smal_list = lo.quick_sort(wight_list)  # Sorterar aktierna efter total rank
 
+    print(smal_list)
     output = "    ---topp 5---\n\n"
     for i in range(len(analys[0])):
         if i == 5:  # Visar bara topp 5 aktier
@@ -105,13 +164,18 @@ def run_best_analysis():
         index = wight_list.index(smal_list[i])  # Hitta index för nästa bäst rankade aktie
         smal_list[i] = ""  # Tömmer värde så vi inte återanvänder samma
         wight_list[index] = ""
-        
+        rocs=""
+        Roc=lo.roc(analys[0][index])
+        for ii in range(len(Roc)):
+            rocs+=Roc[ii]+" "
+
         # Lägger till analysdata i utmatningen
         output += f"#{i+1} {analys[0][index]} :\n"
         for x in range(len(analys[1][index])):
             output += f"{analys[1][index][x]}\n"
-        output += f"rsi:{lo.calc_rsi(so.get_ohlc_data(analys[0][index]))}\n"
-        output += f"bbu:{lo.Boll_Band(analys[0][index])}\n"
+        output += f"rsi: {lo.calc_rsi(lo.get_ohlc_data(analys[0][index]))}\n"
+        output += f"bbu: {lo.Boll_Band(analys[0][index])}\n"
+        output += f"roc: {rocs}\n"
         output += "\n"
 
     result_label4.config(text=output)  # Visar resultatet
@@ -180,6 +244,7 @@ def show_single_analyze():
     index_frame.pack_forget()
     list_frame.pack_forget()
     best_frame.pack_forget()
+    formation_frame.pack_forget()
     single_frame.pack(padx=10, pady=10)
 
 
@@ -189,6 +254,7 @@ def show_list_analyze():
     index_frame.pack_forget()
     single_frame.pack_forget()
     best_frame.pack_forget()
+    formation_frame.pack_forget()
     list_frame.pack(padx=10, pady=10)
 
 
@@ -198,6 +264,7 @@ def show_index_analyze():
     list_frame.pack_forget()
     single_frame.pack_forget()
     best_frame.pack_forget()
+    formation_frame.pack_forget()
     index_frame.pack(padx=10, pady=10)
 
 
@@ -207,8 +274,15 @@ def show_best_analyze():
     list_frame.pack_forget()
     single_frame.pack_forget()
     index_frame.pack_forget()
+    formation_frame.pack_forget()
     best_frame.pack(padx=10, pady=10)
 
+def show_formation_info():
+    index_frame.pack_forget()
+    single_frame.pack_forget()
+    best_frame.pack_forget()
+    list_frame.pack_forget()
+    formation_frame.pack(padx=10, pady=10)
     
 
 # ======= GUI ========
@@ -255,6 +329,7 @@ colored_button(top_button_frame, "Single Analyze", show_single_analyze).pack(sid
 colored_button(top_button_frame, "List Analyze", show_list_analyze).pack(side="left", padx=5)
 colored_button(top_button_frame, "Index Analyze", show_index_analyze).pack(side="left", padx=5)
 colored_button(top_button_frame, "best stock", show_best_analyze).pack(side="left", padx=5)
+colored_button(top_button_frame, "Formation Info", show_formation_info).pack(side="left", padx=5)
 
 show_ascii_frame()
 
@@ -324,6 +399,42 @@ colored_button(best_frame, "Analyze", run_best_analysis).pack(pady=10)  # Kör a
 # Här visas topplistan med bästa aktier
 result_label4 = tk.Label(best_frame, text="", justify="left", wraplength=400, bg=bg_color, fg=text_color)
 result_label4.pack(padx=10, pady=10)
+
+#info sidan
+
+formation_data = {
+    "Spik-formation": "Aktien noterar ny 5-dagars lägsta notering.\nStäningen ligger i den övre fjärdedelen av dagens range.\nStängningen är lägre än föregående dags stängning.\n\nBra vid \nhög vol 57% +1,33%\nmånadsskifte 61% +1.12%\nroc66 + pos fas 61% +2.03%\npositiv marknadsfas - man får bättre betalt per riskenhet",
+    "Reversal-formation": "Aktien noterar en ny 5-dagars lägsta notering.\nStängningskursen ligger i den övre fjärdedelen av dagens range.\nStängningskursen ligger över föregående dags stängning.\nStängningen ligger under föregående dags högsta notering.\n\nFungerar bäst vid positiv marknadsfas och hög volatilitet\n\nbra vid\nroc66 + pos fas 61% +1,82%\nroc66 51% +1,28%\nbra vid roc 66 annars är det inte signifikant bra",
+    "Key reversal-formation": "Aktien noterar en ny 5-dagars lägsta notering.\nStängningskursen ligger i den övre fjärdedelen av dagens.\nStängningen är högre än föregående dags högsta notering.\n\nFungerar bäst vid negativ marknadsfas fas med hög volatilitet\n\nbra vid\nroc22 63% + 2,84%\nroc5 68% +3,12%\nmånadsskifte 57% +1,24%\nhög vol 58% +1,85%P",
+    "Pattern gap-formation": "Aktien noterade en ny 5-dagars lägsta notering igår.\nStängningskursen ligger i den övre fjärdedelen av dagens range.\nLägsta kursen ligger över föregående dags stängning men är mindre än föregående dags högsta notering\nStängningen ligger över föregående dags högsta notering och stängningskursen för två dagar sedan.\n\nFungerar bäst vid positiv marknadsfas med låg volatilitet\n\nbra vid\nmånadsskifte 66% +1,25%\nROC66 + pos fas 66%  +1,65%",
+    "Reversal gap-formation": "Aktien noterade en ny 5-dagars lägsta notering igår.\nStängningskursen ligger i den övre fjärdedelen av dagens range.\nLägsta kursen ligger över föregående dags högsta notering.\nStängningen ligger över föregående dags stängning och stängningen dagen innan dess.\n\nBäst vid negativ marknadsfas, månadsskifte och medium volatilitet\n\nbra vid\nmånadsskifte 66% +1,51%",
+    "180-formation": "Aktien noterar en ny 5-dagars lägsta notering idag eller igår.\nStängningen ligger i den övre fjärdedelen av dagens range.\nFöregående dags stängning ligger i den nedre fjärdedelen av rangen.\n\nBäst vid positiv marknadsfas och hög volatilitet\n\nbra vid \nroc66 + pos fas 60% +1,01%",
+    "Interference-formation": "Stängningen för fyra dagar sedan är negativ.\nStängningen för tre dagar sedan är positiv.\nStängningen för två dagar sedan, föregående dag och idag är negativ.\n\nBäst vid positiv marknadsfas och hög volatilitet\n\nbra vid \nhög vol 65% 2.36%\nmånadsskifte 63% +1,71%\nroc5 61% +1,45%\nroc22 58% +1,54%\nroc66 65% + 1,73%",
+    "Holy grail-formationen": "Dagens lägsta notering är under sma-20\nstängningen är över sma-20 och i övre ¼ av dagens range\nsma-20 är stigande\nFöregående dags lägsta värde är större än föregående dags sma-20 glidande medelvärde.\n\nBäst vid positiv marknadsfas och hög vol.\n\nbra vid \nhög vol 55% +1,31% & edge 2,10%\nmånadsskiftet  62% + 1,12% & edge 1,19%\npos fas  57% +0,82% edge 0.96%",
+    "Rikoschett-formation": "Aktiens stängningskurs ligger i den nedre 10 procenten av dagens range.\n\nBäst vid positiv marknadsfas samt hög vol.\n\nbra vid\nhög vol 55% + 0,95% & edge 1,21%\nmånadsskiftet 58% + 0,94% & edge 1,02%\nROC5 58% 0,86% & edge 1,02%\nROC22 57% 0,9% & edge 0,91%\nROC66 55% +0,69% & edge 1,1%\nAlla ROC filter fungerar bäst vid positiv marknads fas.",
+    "Impuls-formation": "Aktiens stängning ligger i den övre ¼ av dagens range\ndagens range är minst 2 ggr större än den genomsnittliga set 10 dagar tillbaka \ndagens omsättning är minst 2 ggr större den genomsnittliga omsättningen sett 10 dagar tillbaka\n\nBäst vid negativ marknadsfas och hög vol.\n\nhög vol 55% +0,94% & edge 0,9%\nmånadsskiftet 55% +0,16% & edge 0,47%",
+    "Fortsättnings-formation": "Gårdagens högsta notering är lägre än högsta noteringen för 10 dagar sedan.\nGårdagens högsta notering är lägre än högsta noteringen för 5 dagar sedan.\nGårdagens lägsta notering är högre än lägsta noteringen för 10 dagar sedan.\nDagens lägsta notering är högre än den lägsta noteringen för 5 dagar sedan.\n20-dagars glidande medelvärde ligger över 50-dagars glidande medelvärde.\n50-dagars glidande medelvärde är stigande.\nDagens stängningskurs är större än den högsta noteringen de fem föregående dagarna.\nDagens range är minst 1.5 gånger större än den genomsnittliga rangen de senaste 10 dagarna.\nDagens omsättning är minst 1.5 gånger större än den genomsnittliga omsättningen de senaste 10 dagarna.\n\nBäst vid positiv marknadsfas och hög vol.\n\nbra vid\nomx 30:\nhög vol 63% +2,2% edge 2,49%\n\növrig large cap:\nlåg vol 68% +1,95% edge 2,35%\nmånadsskifte 58% +1.38% edge 2,14%",
+}
+
+formation_frame = tk.Frame(root, bg=bg_color)
+
+colored_label(formation_frame, "Välj en formation för att se information:").pack(pady=5)
+
+formation_var = tk.StringVar(value="välj formation")
+
+dropdown = tk.OptionMenu(formation_frame, formation_var, *formation_data.keys())
+dropdown.config(bg=btn_color, fg=text_color, activebackground="#555555", activeforeground=text_color)
+dropdown.pack(pady=5)
+
+def show_formation_info_text():
+    info = formation_data.get(formation_var.get(), "Ingen information tillgänglig.")
+    formation_info_label.config(text=info)
+
+colored_button(formation_frame, "Visa info", show_formation_info_text).pack(pady=5)
+
+formation_info_label = tk.Label(formation_frame, text="", wraplength=400, justify="left", bg=bg_color, fg=text_color)
+formation_info_label.pack(padx=10, pady=10)
+
 
 # Startar huvudloopen för gränssnittet
 root.mainloop()
