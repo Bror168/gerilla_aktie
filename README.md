@@ -59,12 +59,13 @@ python analys.py
 
 * [ ] Implementera mer avancerade analysmetoder:
 * [ ] värden på formationer
-* [ ] formation boosters
+* [ ] formation boosters 70% klar
 * [ ] volym mm
+* Om flera aktier visar samma beteände samtidigt är det större sannolikhet att de går upp/ner. 70% klar
+
 
 * [ ] Lägga till datavisualisering
 * [ ] Förbättra felhantering
-* [ ] Dokumentera funktionerna mer utförligt
 
 ## 🤝 Bidra
 

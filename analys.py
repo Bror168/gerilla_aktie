@@ -210,14 +210,12 @@ def sortera(mode):
 
 # analyserar alla aktier på en index, tar ett input med namn på indexen t.ex omx30
 def index_analyze():
-    string = entry3.get().upper()  # Hämtar och konverterar användarens input till versaler
+    string = entry3.get().split(" ")  # Hämtar och konverterar användarens input till versaler
     analys_list = []
+    
 
     # Hämtar lista med tickers beroende på valt index
-    if string == "OMX30":
-        analys_list = so.omx30()
-    if string == "SP500":
-        analys_list = so.get_sp500_list()
+    analys_list=so.get_tickers_on_index(string[0], string[1].upper())
     
     analys = so.list_analys(analys_list)  # Kör teknisk analys på varje aktie i listan
 
@@ -228,6 +226,11 @@ def index_analyze():
             output += f"{analys[1][i][x]}\n"
         output += "\n"
 
+    #lägger till i uotput hur många ggr en formation däk upp i indexen
+    for index, row in analys[2].head(len(analys[2])).iterrows():
+        output += f"{row['form']}: {row['antal']}\n"
+    output += "\n"
+    
     # Skriver även ut tickers på en rad längst ner
     for i in range(len(analys[0])):
         output += f"{analys[0][i]} "
@@ -372,7 +375,7 @@ scrollbar2.config(command=result_text2.yview)
 
 #index analys
 index_frame = tk.Frame(root, bg=bg_color)  # Ram för index analyse-vyn
-colored_label(index_frame, "välj indexlista |OMX30, SP500|").pack()  # Instruktionstext
+colored_label(index_frame, "välj index\n skriv in wikipedia namnet och region\n exemple för omx30: \n https://en.wikipedia.org/wiki/OMX_Stockholm_30 skriver du in: 'OMX_Stockholm_30 ST' ST står för stokholm").pack()  # Instruktionstext
 entry3 = colored_entry(index_frame)  # Inmatningsfält för indexnamn
 entry3.pack(pady=5)
 

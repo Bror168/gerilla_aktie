@@ -2,37 +2,27 @@ import yfinance as yf #https://yfinance-python.org/reference/api/yfinance.Ticker
 import pandas as pd
 import logic as lo
 import time
+from collections import Counter
 
-def get_sp500_list():
-    #hämtar lista på sp500 tickers från wikipedia
-    url = "https://en.wikipedia.org/wiki/List_of_S%26P_500_companies"
+
+def get_tickers_on_index(wiki_index, End):
+    #hämtar lista på tickers i en viss index från wikipedia
+    url = f"https://en.wikipedia.org/wiki/{wiki_index}"
     df_list = pd.read_html(url)
-    sp500_df = df_list[0]  
-    companies = sp500_df[["Security", "Symbol"]]  
-    
-    sp500_list = [row["Symbol"] for _, row in companies.iterrows()] #formatiserar
-    #tar bort företag som inta fans med på yfinance
-    sp500_list.pop(60)
-    sp500_list.pop(74)
-    sp500_list.pop(73)
-    sp500_list.pop(255)
+    companies = pd.DataFrame()
+    for i in range(len(df_list)):
+        try:
+            index_list_df = df_list[i]  
+            
+            if "Symbol" in index_list_df:
+                companies = pd.DataFrame(index_list_df[["Symbol"]])
+        except Exception as e:
+            print(":(")
 
-    sp500_list.pop(281)
-    sp500_list.pop(415)
-    sp500_list.pop(493)
-
-    return sp500_list
-
-def omx30():
-    #hämtar lista på omx30 tickers från wikipedia
-    url = "https://en.wikipedia.org/wiki/OMX_Stockholm_30"
-    df_list = pd.read_html(url)
-    omxs30_df = df_list[1]  
-    companies = omxs30_df[["Company", "Symbol"]]
-
-    omx_list=[]
+    index_list=[]
     # läger på .st på alla tickers, gör om mellan rum till - samt omformatiserar datan
-    for index, row in companies.head(30).iterrows():
+    
+    for index, row in companies.head(len(companies)).iterrows():
         symbol = row["Symbol"]
         ny_symbol=""
         for i in range(len(symbol)):
@@ -40,8 +30,15 @@ def omx30():
                 ny_symbol+="-"
             else:
                 ny_symbol+=symbol[i]
-        omx_list.append(ny_symbol +".ST")
-    return omx_list
+        if End.upper()!= "NONE":
+            index_list.append(ny_symbol +f".{End}")
+        else:
+            index_list.append(ny_symbol)
+    return index_list
+
+def index_edge(index_ticker):
+    edge_true=single_analys(index_ticker)[1]
+    return edge_true
 
 def single_analys(chek_tiker):
     #hämtar ohlc för aktie (ticker)
@@ -94,10 +91,16 @@ def list_analys(list):
         if i%60==0 and i!=0:
             time.sleep(30)
         print(i, len(return_list))
-        if len(return_list)>=60:
-            return return_list , form_list
-              
-    return return_list , form_list
+
+    count_list=[]
+    for i in form_list:
+        count_list.append(i[0])
+    räknare = Counter(count_list)
+
+    # Konvertera till DataFrame
+    df = pd.DataFrame(räknare.items(), columns=["form", "antal"])
+
+    return return_list , form_list, df
 
 #sorterar aktier efter deras rsi värde
 def sort_RSI(list):
